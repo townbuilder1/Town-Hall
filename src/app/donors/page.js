@@ -35,13 +35,13 @@ export default function Home() {
                 🚨
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">জরুরি হেল্পলাইন</h3>
+                <h3 className="font-bold text-white text-base">জরুরি হেল্পライン</h3>
                 <p className="text-xs text-gray-400 mt-0.5">হাসপাতাল, অ্যাম্বুলেন্স ও ফায়ার সার্ভিস</p>
               </div>
             </div>
           </Link>
 
-          <Link href="/blood-donors" className="block">
+          <Link href="/donors" className="block">
             <div className="bg-gray-800/60 hover:bg-gray-800 p-5 rounded-2xl border border-gray-700/50 transition active:scale-[0.99] flex items-center gap-4">
               <div className="w-12 h-12 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center text-2xl">
                 🩸
