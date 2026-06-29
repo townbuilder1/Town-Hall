@@ -1,13 +1,14 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function Home() {
   const [isTrainModalOpen, setIsTrainModalOpen] = useState(false);
 
   const categories = [
-    { name: "জরুরি হেল্পলাইন", info: "হাসপাতাল, অ্যাম্বুলেন্স, পুলিশ, ফায়ার সার্ভিস", icon: "📞", color: "text-rose-400", bg: "bg-rose-500/10", action: () => alert("হেল্পলাইন তালিকা শীঘ্রই আসছে!") },
-    { name: "লাইভ রক্তদাতা", info: "জরুরি রক্তের গ্রুপ ও ডোনার কন্টাক্ট লিস্ট", icon: "🩸", color: "text-red-400", bg: "bg-red-500/10", action: () => alert("রক্তদাতাদের তালিকা তৈরি হচ্ছে!") },
-    { name: "ফেনীর ট্রেনের সময়সূচী", info: "ঢাকা-চট্টগ্রাম রুটের আন্তঃনগর ট্রেনের শিডিউল", icon: "🚆", color: "text-amber-400", bg: "bg-amber-500/10", action: () => setIsTrainModalOpen(true) },
+    { name: "জরুরি হেল্পলাইন", info: "হাসপাতাল, অ্যাম্বুলেন্স, পুলিশ, ফায়ার সার্ভিস", icon: "📞", color: "text-rose-400", bg: "bg-rose-500/10", isLink: true, href: "/emergency" },
+    { name: "লাইভ রক্তদাতা", info: "জরুরি রক্তের গ্রুপ ও ডোনার কন্টাক্ট লিস্ট", icon: "🩸", color: "text-red-400", bg: "bg-red-500/10", isLink: true, href: "/donors" },
+    { name: "ফেনীর ট্রেনের সময়সূচী", info: "ঢাকা-চট্টগ্রাম রুটের আন্তঃনগর ট্রেনের শিডিউল", icon: "🚆", color: "text-amber-400", bg: "bg-amber-500/10", isLink: false, action: () => setIsTrainModalOpen(true) },
   ];
 
   return (
@@ -32,7 +33,7 @@ export default function Home() {
             THE TOWN HALL
           </h1>
           <p className="text-slate-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-            ফেনী শহরের নাগরিকদের জন্য একটি সমন্বিত ডিজিটাল ডিরেক্টরি। প্রয়োজনীয় লোকাল সেবা, যোগাযোগ এবং তথ্য এখন এক ক্লিকে।
+            ফেনী শহরের নাগরিকদের জন্য একটি সমন্বিত ডিজিটাল ডিরেক্টরি। প্রয়োজনীয় লোকাল সেবা, যোগাযোগ এবং তথ্য এখন এক ক্লিকে।
           </p>
         </div>
 
@@ -45,15 +46,31 @@ export default function Home() {
 
         {/* Top Feature Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          {categories.map((item, index) => (
-            <div key={index} onClick={item.action} className="bg-slate-850 border border-slate-800 rounded-2xl p-5 hover:bg-slate-800 transition cursor-pointer shadow-md">
-              <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${item.bg} ${item.color} mb-3 font-bold text-lg`}>
-                {item.icon}
+          {categories.map((item, index) => {
+            if (item.isLink) {
+              return (
+                <Link key={index} href={item.href} className="block">
+                  <div className="bg-slate-850 border border-slate-800 rounded-2xl p-5 hover:bg-slate-800 transition cursor-pointer shadow-md h-full">
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${item.bg} ${item.color} mb-3 font-bold text-lg`}>
+                      {item.icon}
+                    </div>
+                    <h3 className="text-base font-bold text-slate-200 mb-1">{item.name}</h3>
+                    <p className="text-slate-400 text-xs leading-relaxed">{item.info}</p>
+                  </div>
+                </Link>
+              );
+            }
+
+            return (
+              <div key={index} onClick={item.action} className="bg-slate-850 border border-slate-800 rounded-2xl p-5 hover:bg-slate-800 transition cursor-pointer shadow-md">
+                <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${item.bg} ${item.color} mb-3 font-bold text-lg`}>
+                  {item.icon}
+                </div>
+                <h3 className="text-base font-bold text-slate-200 mb-1">{item.name}</h3>
+                <p className="text-slate-400 text-xs leading-relaxed">{item.info}</p>
               </div>
-              <h3 className="text-base font-bold text-slate-200 mb-1">{item.name}</h3>
-              <p className="text-slate-400 text-xs leading-relaxed">{item.info}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* 🛍️ FENI SHOP & 🗺️ MAP GRID */}
@@ -85,7 +102,7 @@ export default function Home() {
             
             <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-700 shadow-inner">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58064.91238475267!2d91.3643792!3d23.0159074!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x37536b13978a1a23%3A0x6b6c2a129dcfbd25!2sFeni!5e0!3m2!1sen!2sbd!4v1719515000000!5m2!1sen!2sbd" 
+                src="https://maps.google.com/maps?q=Feni&t=&z=13&ie=UTF8&iwloc=&output=embed" 
                 className="w-full h-full border-0 grayscale invert opacity-80" 
                 allowFullScreen="" 
                 loading="lazy" 
@@ -102,18 +119,18 @@ export default function Home() {
           <div className="bg-slate-850 border border-slate-800 rounded-2xl w-full max-w-xl p-6 shadow-2xl">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-bold text-amber-400 flex items-center gap-2">
-                <span>🚆</span> ফেনী স্টেশন ট্রেনের সময়সূচী
+                <span>🚆</span> ফেনী স্টেশন ট্রেনের সময়সূচী
               </h3>
               <button onClick={() => setIsTrainModalOpen(false)} className="text-slate-400 hover:text-slate-100 text-sm font-bold bg-slate-800 px-2.5 py-1 rounded-lg">বন্ধ করুন</button>
             </div>
             
-            <p className="text-xs text-slate-400 mb-4">ফেনী স্টেশন দিয়ে যাতায়াতকারী প্রধান প্রধান আন্তঃনগর ট্রেনের তালিকা নিচে দেওয়া হলো। টিকিট কাটার জন্য সরাসরি রেলওয়ের অফিশিয়াল সাইট ভিজিট করুন।</p>
+            <p className="text-xs text-slate-400 mb-4">ফেনী স্টেশন দিয়ে যাতায়াতকারী প্রধান প্রধান আন্তঃনগর ট্রেনের তালিকা নিচে দেওয়া হলো। টিকিট কাটার জন্য সরাসরি রেলওয়ের অফিশিয়াল সাইট ভিজিট করুন।</p>
             
             <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
               <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center">
                 <div>
-                  <h4 className="text-xs font-bold text-slate-200">সোনার বাংলা এক্সপ্রেস (৭৮৭)</h4>
-                  <p className="text-[11px] text-slate-450">ঢাকা থেকে চট্টগ্রাম | ফেনী পৌঁছায়: সকাল ১০:৪৫</p>
+                  <h4 className="text-xs font-bold text-slate-200">সোনার বাংলা ایکسپریس (৭৮৭)</h4>
+                  <p className="text-[11px] text-slate-400">ঢাকা থেকে চট্টগ্রাম | ফেনী পৌঁছায়: সকাল ১০:৪৫</p>
                 </div>
                 <span className="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-1 rounded font-bold">মঙ্গলবার বন্ধ</span>
               </div>
@@ -121,7 +138,7 @@ export default function Home() {
               <div className="p-3 bg-slate-900 rounded-xl border border-slate-800 flex justify-between items-center">
                 <div>
                   <h4 className="text-xs font-bold text-slate-200">মহানগর গোধূলী (৭০৪)</h4>
-                  <p className="text-[11px] text-slate-450">চট্টগ্রাম থেকে ঢাকা | ফেনী পৌঁছায়: বিকেল ০৪:১৫</p>
+                  <p className="text-[11px] text-slate-400">চট্টগ্রাম থেকে ঢাকা | ফেনী পৌঁছায়: বিকেল ০৪:১৫</p>
                 </div>
                 <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-1 rounded font-bold">প্রতিদিন চলে</span>
               </div>
@@ -133,7 +150,7 @@ export default function Home() {
               rel="noreferrer"
               className="block w-full text-center text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl mt-4 transition"
             >
-              অনলাইনে টিকিট কাটুন (রেলওয়ে ওয়েবসাইট) →
+              অনলাইনে টিকিট কাটুন (রেলওয়ে ওয়েবসাইট) →
             </a>
           </div>
         </div>
