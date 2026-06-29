@@ -6,7 +6,7 @@ export default function Home() {
   const [isTrainModalOpen, setIsTrainModalOpen] = useState(false);
 
   const categories = [
-    { name: "জরুরি হেল্পライン", info: "হাসপাতাল, অ্যাম্বুলেন্স, পুলিশ, ফায়ার সার্ভিস", icon: "📞", color: "text-rose-400", bg: "bg-rose-500/10", isLink: true, href: "/emergency" },
+    { name: "জরুরি হেল্পলাইন", info: "হাসপাতাল, অ্যাম্বুলেন্স, police, ফায়ার সার্ভিস", icon: "📞", color: "text-rose-400", bg: "bg-rose-500/10", isLink: true, href: "/emergency" },
     { name: "লাইভ রক্তদাতা", info: "জরুরি রক্তের গ্রুপ ও ডোনার কন্টাক্ট লিস্ট", icon: "🩸", color: "text-red-400", bg: "bg-red-500/10", isLink: true, href: "/donors" },
     { name: "ফেনীর ট্রেনের সময়সূচী", info: "ঢাকা-চট্টগ্রাম রুটের আন্তঃনগর ট্রেনের শিডিউল", icon: "🚆", color: "text-amber-400", bg: "bg-amber-500/10", isLink: false, action: () => setIsTrainModalOpen(true) },
   ];
@@ -17,7 +17,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex flex-col">
             <span className="text-xl font-black tracking-wider text-emerald-400">TOWN HALL</span>
-            <span className="text-[10px] text-slate-400 tracking-widest -mt-1 font-bold uppercase">ফেনী充লোকাল হাব</span>
+            <span className="text-[10px] text-slate-400 tracking-widest -mt-1 font-bold uppercase">ফেনী লোকাল হাব</span>
           </div>
           <span className="text-xs bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700 text-slate-300 font-medium">
             By Town Builder
@@ -91,11 +91,11 @@ export default function Home() {
 
           <div className="bg-slate-850 border border-slate-800 rounded-2xl p-5 shadow-md lg:col-span-2">
             <h3 className="text-base font-bold text-slate-200 mb-2 flex items-center gap-2"><span>🗺️</span> ফেনী শহর লাইভ ম্যাপ</h3>
-            <p className="text-xs text-slate-400 mb-4">গুগল ম্যাপের মাধ্যমে সরাসরি ফেনী শহরের অবস্থান দেখে নিন。</p>
+            <p className="text-xs text-slate-400 mb-4">গুগল ম্যাপের মাধ্যমে সরাসরি ফেনী শহরের অবস্থান দেখে নিন।</p>
             
             <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-700 shadow-inner">
               <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d58957.92244243673!2d91.3653199!3d23.0130932!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x37536e2f497dc2fd%3A0x63be50f9687e35b7!2sFeni!5e0!3m2!1sen!2sbd!4v1710000000000" 
+                src="https://maps.google.com/maps?q=Feni&t=&z=13&ie=UTF8&iwloc=&output=embed" 
                 className="w-full h-full border-0 grayscale invert opacity-80" 
                 allowFullScreen="" 
                 loading="lazy" 
