@@ -35,7 +35,7 @@ export async function POST(request) {
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are a memory processor. Analyze the user's current message and the existing knowledge about them. If the user mentions any important long-term facts about themselves (like name, location, occupation, critical preference, or core problem), update the knowledge base. Respond ONLY with the updated bullet points. If no new important facts are shared, respond exactly with the existing knowledge.` 
+                        content: "You are a memory processor. Analyze the user's current message and the existing knowledge about them. If the user mentions any important long-term facts about themselves (like name, location, occupation, critical preference, or core problem), update the knowledge base. Respond ONLY with the updated bullet points. If no new important facts are shared, respond exactly with the existing knowledge." 
                     },
                     { role: "user", content: `Existing Knowledge:\n${userMemory}\n\nUser Message: ${message}` }
                 ]
@@ -74,6 +74,7 @@ export async function POST(request) {
 
         return NextResponse.json({ reply: finalResponse });
     } catch (error) {
+        console.error("REAL_ERROR_LOG:", error);
         return NextResponse.json({ error: "Service Temporary Unavailable." }, { status: 500 });
     }
 }
