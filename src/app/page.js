@@ -2,14 +2,24 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 
+const ButtonLoader = () => (
+  <svg className="animate-spin h-3.5 w-3.5 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+);
+
 export default function Home() {
+  const [darkMode, setDarkMode] = useState(false);
   const [isTrainModalOpen, setIsTrainModalOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'আসসালামু আলাইকুম! ফেনী টাউন হলের ডিজিটাল অ্যাসিস্ট্যান্টে আপনাকে স্বাগতম। আপনাকে কীভাবে সাহায্য করতে পারি?' }
+    { role: 'assistant', content: 'আসসালামু আলাইকুম! আপনাকে কীভাবে সাহায্য করতে পারি?' }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const chatEndRef = useRef(null);
 
   useEffect(() => {
@@ -19,9 +29,10 @@ export default function Home() {
   }, [messages, isChatOpen]);
 
   const categories = [
-    { name: "জরুরি হেল্পলাইন", info: "হাসপাতাল, অ্যাম্বুলেন্স, police, ফায়ার সার্ভিস", icon: "📞", color: "text-rose-400", bg: "bg-rose-500/10 border-rose-500/20", isLink: true, href: "/emergency" },
-    { name: "লাইভ রক্তদাতা", info: "জরুরি রক্তের গ্রুপ ও ডোনার কন্টাক্ট লিস্ট", icon: "🩸", color: "text-red-400", bg: "bg-red-500/10 border-red-500/20", isLink: true, href: "/donors" },
-    { name: "ফেনীর ট্রেনের সময়সূচী", info: "ঢাকা-চট্টগ্রাম রুটের আন্তঃনগর ট্রেনের শিডিউল", icon: "🚆", color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20", isLink: false, action: () => setIsTrainModalOpen(true) },
+    { name: "জরুরি হেল্পলাইন", info: "হাসপাতাল, অ্যাম্বুলেন্স, পুলিশ, ফায়ার সার্ভিস", isLink: true, href: "/emergency" },
+    { name: "রক্তদাতা", info: "জরুরি রক্তের গ্রুপ ও ডোনারদের তথ্য", isLink: true, href: "/donors" },
+    { name: "শপ ডিরেক্টরি", info: "রেস্টুরেন্ট ও শপ ডিরেক্টরি", isLink: true, href: "/shops" },
+    { name: "ট্রেন শিডিউল", info: "ফেনী ট্রেনের সময়সূচী", isLink: false, action: () => setIsTrainModalOpen(true) },
   ];
 
   const handleSendMessage = async (e) => {
@@ -46,232 +57,251 @@ export default function Home() {
         body: JSON.stringify({ message: userMsg, sessionId: sessionId })
       });
       const data = await response.json();
-      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply || "Service Temporary Unavailable." }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: data.reply || "সার্ভারে সাময়িক সমস্যা হচ্ছে।" }]);
     } catch (error) {
-      setMessages((prev) => [...prev, { role: 'assistant', content: "Service Temporary Unavailable." }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: "সার্ভারে সাময়িক সমস্যা হচ্ছে।" }]);
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    setIsSearching(true);
+    
+    setTimeout(() => {
+      setIsSearching(false);
+    }, 1000);
+  };
+
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-slate-100 font-sans relative selection:bg-emerald-500 selection:text-slate-950">
+    <div className={`min-h-screen font-sans transition-colors duration-300 ${darkMode ? 'bg-slate-950 text-slate-100' : 'bg-[#f8fafc] text-slate-800'}`}>
       
-      {/* Background Subtle Glow Accent */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[350px] bg-gradient-to-b from-emerald-500/10 via-teal-500/5 to-transparent blur-3xl pointer-events-none z-0" />
-
-      {/* NAVBAR */}
-      <nav className="border-b border-slate-800/80 bg-[#0b0f19]/80 backdrop-blur-md sticky top-0 z-50 transition-all">
+      <header className={`border-b sticky top-0 z-40 backdrop-blur-md transition-colors ${darkMode ? 'bg-slate-900/90 border-slate-800' : 'bg-white/90 border-slate-200'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex flex-col">
-            <span className="text-xl font-black tracking-wider bg-gradient-to-r from-emerald-400 to-teal-200 bg-clip-text text-transparent">TOWN HALL</span>
-            <span className="text-[9px] text-slate-400 tracking-widest -mt-1 font-extrabold uppercase">ফেনী লোকাল হাব</span>
-          </div>
-          <span className="text-xs bg-slate-800/80 hover:bg-slate-800 px-3.5 py-1.5 rounded-full border border-slate-700/60 text-slate-300 font-medium transition cursor-default">
-            By Town Builder
-          </span>
-        </div>
-      </nav>
-
-      <main className="max-w-7xl mx-auto px-4 py-8 relative z-10">
-        
-        {/* HERO SECTION */}
-        <div className="text-center mb-8 mt-2">
-          <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full mb-4 animate-fade-in">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            ১০০% ডিজিটাল ফেনী সিটিকে লাইভ অভিজ্ঞতা দিন
-          </div>
-          <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white mb-4">
-            THE <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 bg-clip-text text-transparent">TOWN HALL</span>
-          </h1>
-          <p className="text-slate-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
-            ফেনী শহরের নাগরিকদের জন্য একটি সমন্বিত ডিজিটাল ডিরেক্টরি। প্রয়োজনীয় লোকাল সেবা, যোগাযোগ এবং তথ্য এখন এক ক্লিকে।
-          </p>
-        </div>
-
-        {/* ==================== 🌟 PREMIUM AD SLOT 1: HERO BILLBOARD ==================== */}
-        <div className="mb-8 p-6 rounded-3xl bg-gradient-to-r from-amber-950/30 via-slate-900 to-emerald-950/30 border-2 border-emerald-500/40 hover:border-emerald-400 transition-all duration-300 text-center relative overflow-hidden group shadow-2xl shadow-emerald-950/30">
-          <div className="absolute top-0 right-0 bg-gradient-to-l from-emerald-500 to-teal-500 text-slate-950 text-[10px] font-black uppercase px-4 py-1 rounded-bl-xl shadow-md tracking-wider">
-            ⭐ PREMIUM AD SLOT
-          </div>
-          <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all" />
           
-          <span className="text-[10px] font-extrabold tracking-widest text-emerald-400 uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-0.5 rounded-full mb-3 inline-block">
-            High Priority Banner
-          </span>
-          <h2 className="text-xl sm:text-2xl font-black text-white tracking-wide">আপনার ব্র্যান্ডের বড় প্রিমিয়াম বিজ্ঞাপন দিন এখানে!</h2>
-          <p className="text-slate-300 text-xs sm:text-sm mt-1 max-w-lg mx-auto">ফেনী শহরের প্রতিদিনের হাজার হাজার ভিজিটরের সামনে সর্বপ্রথমে পৌঁছান।</p>
-          
-          <button className="mt-4 text-xs bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 text-slate-950 font-black px-6 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
-            প্রিমিয়াম স্লট বুক করুন →
-          </button>
-        </div>
-
-        {/* LOCAL NOTICE & WEATHER */}
-        <div className="mb-8 p-5 rounded-2xl bg-slate-900/50 border border-slate-800/80 backdrop-blur-sm shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-4 text-center sm:text-left">
-            <div className="h-12 w-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-2xl shrink-0 shadow-inner">
-              🌤️
-            </div>
-            <div>
-              <span className="text-[10px] font-bold tracking-wider text-cyan-400 uppercase bg-cyan-500/10 border border-cyan-500/20 px-2 py-0.5 rounded">লোকাল নোটিশ</span>
-              <h3 className="text-base font-bold text-slate-200 mt-1">আজকের ফেনী শহরের আবহাওয়া</h3>
-              <p className="text-slate-400 text-xs mt-0.5">আংশিক মেঘলা আকাশ, হালকা বাতাস ও ভ্যাপসা গরম থাকতে পারে। বৃষ্টিপাতের সম্ভাবনা ২০%।</p>
-            </div>
-          </div>
-          <div className="bg-slate-950/60 border border-slate-800 px-5 py-2.5 rounded-2xl text-center min-w-[120px] shadow-inner">
-            <span className="text-2xl font-black text-cyan-400 block">32°C</span>
-            <span className="text-[10px] text-slate-400 font-medium">রিয়েল-টাইম ফিল</span>
-          </div>
-        </div>
-
-        {/* SERVICE CARDS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
-          {categories.map((item, index) => {
-            const CardContent = (
-              <div className="bg-slate-900/40 border border-slate-800/80 hover:border-slate-700/80 rounded-2xl p-5 hover:bg-slate-850/60 transition-all duration-300 cursor-pointer shadow-lg hover:shadow-xl hover:-translate-y-1 h-full flex flex-col justify-between group">
-                <div>
-                  <div className={`h-12 w-12 rounded-2xl border flex items-center justify-center ${item.bg} ${item.color} mb-4 font-bold text-xl group-hover:scale-110 transition-transform`}>
-                    {item.icon}
-                  </div>
-                  <h3 className="text-base font-bold text-slate-100 mb-1 group-hover:text-emerald-400 transition-colors">{item.name}</h3>
-                  <p className="text-slate-400 text-xs leading-relaxed">{item.info}</p>
-                </div>
-                <div className="mt-4 flex items-center text-xs font-semibold text-slate-400 group-hover:text-emerald-400 transition-colors">
-                  <span>অ্যাক্সেস করুন</span>
-                  <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
-                </div>
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-base shadow-sm">
+                TH
               </div>
-            );
+              <div>
+                <span className="text-lg font-bold tracking-tight block leading-none">TownHallBD</span>
+                <span className="text-[10px] text-emerald-600 font-semibold tracking-wider">ফেনী লোকাল হাব</span>
+              </div>
+            </div>
 
-            return item.isLink ? (
-              <Link key={index} href={item.href} className="block">{CardContent}</Link>
-            ) : (
-              <div key={index} onClick={item.action}>{CardContent}</div>
-            );
-          })}
-        </div>
+            <nav className="hidden md:flex items-center gap-6 text-xs font-semibold">
+              <Link href="/" className="text-emerald-600 border-b-2 border-emerald-600 pb-1">হোম</Link>
+              <Link href="/emergency" className={`${darkMode ? 'text-slate-300 hover:text-emerald-400' : 'text-slate-600 hover:text-emerald-600'} transition`}>জরুরি ডিরেক্টরি</Link>
+              <Link href="/shops" className={`${darkMode ? 'text-slate-300 hover:text-emerald-400' : 'text-slate-600 hover:text-emerald-600'} transition`}>শপ ডিরেক্টরি</Link>
+              <Link href="/places" className={`${darkMode ? 'text-slate-300 hover:text-emerald-400' : 'text-slate-600 hover:text-emerald-600'} transition`}>দর্শনীয় স্থান</Link>
+            </nav>
+          </div>
 
-        {/* ==================== 🔹 NORMAL AD SLOT 1: MID-PAGE BANNER ==================== */}
-        <div className="mb-8 p-4 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="text-[9px] bg-slate-800 text-slate-400 px-2 py-1 rounded font-bold uppercase border border-slate-700">Normal Ad</span>
-            <div>
-              <h4 className="text-xs font-bold text-slate-200">লোকাল শপ বা ছোট প্রতিষ্ঠানের বিজ্ঞাপন স্পেস</h4>
-              <p className="text-[11px] text-slate-400">সাধ্যের মধ্যে সেরা দামে ফেনীবাসীকে আপনার সেবা জানান।</p>
-            </div>
-          </div>
-          <button className="text-xs text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl font-semibold transition whitespace-nowrap">
-            বিজ্ঞাপন রেট দেখুন →
-          </button>
-        </div>
+            <button 
+              onClick={() => setDarkMode(!darkMode)}
+              className={`p-2 rounded-xl border text-xs font-medium flex items-center gap-2 transition ${
+                darkMode ? 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700' : 'bg-slate-100 border-slate-200 text-slate-700 hover:bg-slate-200'
+              }`}
+              aria-label="Toggle Theme"
+            >
+              {darkMode ? (
+                <>
+                  <svg className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"/></svg>
+                  <span>Light</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 text-slate-600" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"/></svg>
+                  <span>Dark</span>
+                </>
+              )}
+            </button>
 
-        {/* DIRECTORY & MAP SECTION */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          {/* Shop Directory */}
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:border-slate-700/80 transition-all">
-            <div>
-              <h3 className="text-base font-bold text-slate-100 mb-2 flex items-center gap-2"><span>🛍️</span> ফেনী শপ ডিরেক্টরি</h3>
-              <p className="text-xs text-slate-400 mb-4">শহরের সেরা দোকান, রেস্টুরেন্ট এবং লোকাল ব্র্যান্ডগুলোর তালিকা।</p>
-              
-              <div className="space-y-2.5">
-                
-                {/* 🌟 PREMIUM AD IN-FEED (Featured Shop Slot) */}
-                <div className="p-3 rounded-xl bg-gradient-to-r from-amber-500/10 to-slate-900 border border-amber-500/40 flex justify-between items-center relative overflow-hidden">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] bg-amber-500/20 text-amber-400 px-1.5 py-0.5 rounded font-black uppercase">Featured</span>
-                    <span className="text-xs font-bold text-amber-300">🔥 Grand Restaurant</span>
-                  </div>
-                  <span className="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full font-bold">Open</span>
-                </div>
-
-                {/* 🔹 NORMAL AD IN-FEED */}
-                <div className="p-3 rounded-xl bg-slate-950/40 border border-slate-800/80 flex justify-between items-center hover:border-slate-700 transition">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-bold uppercase">Ad</span>
-                    <span className="text-xs font-medium text-slate-300">আপনার শপ লিস্ট করুন</span>
-                  </div>
-                  <span className="text-[10px] text-emerald-400 font-semibold cursor-pointer">Add Shop</span>
-                </div>
-
-                <div className="p-3 rounded-xl bg-slate-950/50 border border-slate-800/60 flex justify-between items-center opacity-60">
-                  <span className="text-xs font-semibold text-slate-300">📱 Local Gadget Zone</span>
-                  <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-full font-bold">Closed</span>
-                </div>
-              </div>
-            </div>
-            <button className="w-full text-center text-xs text-emerald-400 font-bold bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 py-2.5 rounded-xl mt-4 transition">
-              সব দোকান দেখুন →
+            <button className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-sm">
+              লগইন
             </button>
           </div>
 
-          {/* History Section */}
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 shadow-lg flex flex-col justify-between hover:border-slate-700/80 transition-all">
-            <div>
-              <h3 className="text-base font-bold text-slate-100 mb-2 flex items-center gap-2"><span>🏛️</span> ইতিহাস ও দর্শনীয় স্থান</h3>
-              <p className="text-xs text-slate-400 mb-4">ফেনীর গৌরবময় ইতিহাস, ঐতিহ্য এবং বিখ্যাত দর্শনীয় স্থানগুলোর মেগা গাইডলাইন।</p>
-              <div className="space-y-2.5">
-                <div className="p-3 rounded-xl bg-slate-950/50 border border-slate-800/60 text-xs text-slate-300 font-medium hover:border-slate-700 transition">
-                  🌊 মুহুরী প্রজেক্ট (সেচ ও বায়ু বিদ্যুৎ)
-                </div>
-                <div className="p-3 rounded-xl bg-slate-950/50 border border-slate-800/60 text-xs text-slate-300 font-medium hover:border-slate-700 transition">
-                  🏰 শমশের গাজীর কেল্লা ও ঐতিহ্যবাহী মিষ্টি
+        </div>
+      </header>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          
+          <div className="lg:col-span-8 space-y-6">
+            
+            <div className={`p-8 rounded-3xl border relative overflow-hidden transition ${
+              darkMode ? 'bg-slate-900 border-slate-800' : 'bg-emerald-50/50 border-emerald-100'
+            }`}>
+              <div className="max-w-md relative z-10">
+                <h1 className={`text-2xl sm:text-3xl font-black leading-tight mb-2 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                  ফেনী শহরের ডিজিটাল ডিরেক্টরি
+                </h1>
+                <p className={`text-xs sm:text-sm mb-6 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+                  জরুরি সেবা, রক্তদাতা, ট্রেন শিডিউল এবং শহরের প্রয়োজনীয় সকল তথ্য।
+                </p>
+
+                <form onSubmit={handleSearch} className="flex items-center gap-2 bg-white rounded-xl p-1.5 shadow-sm border border-slate-200">
+                  <div className="pl-3 text-slate-400">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                  </div>
+                  <input 
+                    type="text" 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="কী খুঁজছেন?" 
+                    className="w-full text-xs text-slate-800 focus:outline-none px-2"
+                  />
+                  <button 
+                    type="submit"
+                    disabled={isSearching}
+                    className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white text-xs font-semibold px-5 py-2 rounded-lg transition shrink-0 flex items-center gap-2 min-w-[75px] justify-center"
+                  >
+                    {isSearching ? <ButtonLoader /> : "খুঁজুন"}
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              {categories.map((cat, idx) => {
+                const Card = (
+                  <div className={`p-4 rounded-2xl border flex flex-col justify-between h-36 transition duration-200 ${
+                    darkMode 
+                      ? 'bg-slate-900 border-slate-800 hover:border-slate-700' 
+                      : 'bg-white border-slate-200/80 hover:shadow-md'
+                  }`}>
+                    <div>
+                      <h3 className={`font-bold text-sm mb-1 ${darkMode ? 'text-slate-100' : 'text-slate-900'}`}>{cat.name}</h3>
+                      <p className={`text-[11px] leading-relaxed ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>{cat.info}</p>
+                    </div>
+                    <span className="text-emerald-600 text-[11px] font-semibold flex items-center gap-1">
+                      প্রবেশ করুন →
+                    </span>
+                  </div>
+                );
+
+                return cat.isLink ? (
+                  <Link key={idx} href={cat.href}>{Card}</Link>
+                ) : (
+                  <div key={idx} onClick={cat.action} className="cursor-pointer">{Card}</div>
+                );
+              })}
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/80'}`}>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">লোকাল তথ্য</h4>
+                <h3 className={`text-sm font-bold mb-1 ${darkMode ? 'text-white' : 'text-slate-900'}`}>আজকের আবহাওয়া</h3>
+                <p className={`text-xs mb-2 ${darkMode ? 'text-slate-400' : 'text-slate-600'}`}>আংশিক মেঘলা আকাশ, তাপমাত্রা প্রায় ৩১° সে.</p>
+              </div>
+
+              <div className={`p-4 rounded-2xl border ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/80'}`}>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-600 mb-2">ফেনী ম্যাপ</h4>
+                <div className="w-full h-24 rounded-xl overflow-hidden border border-slate-200">
+                  <iframe 
+                    src="https://maps.google.com/maps?q=Feni&t=&z=13&ie=UTF8&iwloc=&output=embed" 
+                    className="w-full h-full border-0" 
+                    loading="lazy"
+                  ></iframe>
                 </div>
               </div>
             </div>
-            <Link href="/places" className="block w-full text-center text-xs text-purple-400 font-bold bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 py-2.5 rounded-xl mt-4 transition">
-              সবগুলো স্থান ও খাবারের ইতিহাস দেখুন →
-            </Link>
+
           </div>
 
-          {/* Map Section */}
-          <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 shadow-lg hover:border-slate-700/80 transition-all">
-            <h3 className="text-base font-bold text-slate-100 mb-2 flex items-center gap-2"><span>🗺️</span> ফেনী শহর লাইভ ম্যাপ</h3>
-            <p className="text-xs text-slate-400 mb-4">গুগল ম্যাপের মাধ্যমে সরাসরি ফেনী শহরের অবস্থান দেখে নিন।</p>
-            <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-800 shadow-inner relative group">
-              <iframe 
-                src="https://maps.google.com/maps?q=Feni&t=&z=13&ie=UTF8&iwloc=&output=embed" 
-                className="w-full h-full border-0 grayscale invert opacity-75 group-hover:opacity-100 group-hover:grayscale-0 transition-all duration-500" 
-                allowFullScreen="" 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-              ></iframe>
+          <div className="lg:col-span-4 space-y-6">
+            
+            <div className={`p-5 rounded-3xl border relative overflow-hidden transition ${
+              darkMode ? 'bg-slate-900 border-emerald-500/30' : 'bg-emerald-900 text-white border-emerald-800'
+            }`}>
+              <span className="text-[9px] bg-emerald-500 text-slate-950 font-black px-2 py-0.5 rounded uppercase tracking-wider mb-2 inline-block">
+                SPONSORED
+              </span>
+              <h3 className="text-base font-bold mb-1 text-white">আপনার বিজ্ঞাপন দিন</h3>
+              <p className="text-xs text-slate-300 mb-4">ফেনী টাউন হলের মাধ্যমে আপনার ব্যবসার প্রচারণা বাড়ান।</p>
+              <button className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs py-2.5 rounded-xl transition">
+                যোগাযোগ করুন
+              </button>
             </div>
+
+            <div className={`p-5 rounded-3xl border transition ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200/80'}`}>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className={`text-sm font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>দর্শনীয় স্থান</h3>
+                <Link href="/places" className="text-xs text-emerald-600 font-semibold hover:underline">সব দেখুন</Link>
+              </div>
+
+              <div className="space-y-3">
+                <div className={`p-2.5 rounded-xl border flex items-center gap-3 ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
+                  <div className="w-10 h-10 bg-emerald-100 text-emerald-700 font-bold rounded-lg shrink-0 flex items-center justify-center text-xs">
+                    MP
+                  </div>
+                  <div>
+                    <h4 className={`text-xs font-bold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>মুহুরী প্রজেক্ট</h4>
+                    <p className="text-[10px] text-slate-400">ছাগলনাইয়া, ফেনী</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
 
         </div>
       </main>
 
-      {/* FLOATING CHATBOT TOGGLE BUTTON */}
+      <footer className={`border-t py-6 mt-12 transition ${darkMode ? 'bg-slate-900 border-slate-800 text-slate-400' : 'bg-white border-slate-200 text-slate-600'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
+          <p>© 2026 Town Builder. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:underline">গোপনীয়তা নীতি</Link>
+            <Link href="/terms" className="hover:underline">শর্তাবলী</Link>
+            <Link href="/contact" className="hover:underline">যোগাযোগ</Link>
+          </div>
+        </div>
+      </footer>
+
       <button 
         onClick={() => setIsChatOpen(!isChatOpen)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 hover:from-emerald-300 hover:to-teal-300 flex items-center justify-center text-2xl shadow-2xl shadow-emerald-500/30 hover:scale-110 active:scale-95 transition-all duration-300 z-50 text-slate-950 font-bold"
+        className="fixed bottom-6 right-6 h-12 w-12 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg hover:scale-105 active:scale-95 transition-all duration-200 z-50 group"
+        aria-label="Toggle Assistant"
       >
-        {isChatOpen ? '✕' : '🤖'}
+        {isChatOpen ? (
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        ) : (
+          <svg className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        )}
       </button>
 
-      {/* CHAT WINDOW */}
       {isChatOpen && (
-        <div className="fixed bottom-24 right-4 sm:right-6 w-[calc(100%-2rem)] sm:w-[380px] h-[520px] bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden z-50 animate-fade-in">
-          <div className="p-4 border-b border-slate-800 bg-slate-950/80 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="h-3 w-3 rounded-full bg-emerald-400 animate-pulse"></div>
+        <div className={`fixed bottom-22 right-4 sm:right-6 w-[calc(100%-2rem)] sm:w-[360px] h-[460px] border rounded-3xl shadow-2xl flex flex-col overflow-hidden z-50 transition ${
+          darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+        }`}>
+          <div className="p-4 border-b border-slate-200 dark:border-slate-800 bg-emerald-600 text-white flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="h-2.5 w-2.5 rounded-full bg-emerald-300 animate-pulse"></div>
               <div>
-                <h4 className="text-xs font-black tracking-wider text-white">TOWN HALL AI</h4>
-                <p className="text-[10px] text-emerald-400 font-medium">Digital Assistant</p>
+                <h4 className="text-xs font-bold tracking-wider">TOWN HALL AI</h4>
+                <p className="text-[10px] text-emerald-100 font-medium">Digital Assistant</p>
               </div>
             </div>
-            <button onClick={() => setIsChatOpen(false)} className="text-slate-400 hover:text-white text-xs">✕</button>
+            <button onClick={() => setIsChatOpen(false)} className="text-white/80 hover:text-white text-xs font-bold">✕</button>
           </div>
 
-          <div className="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-950/30">
+          <div className="flex-1 p-4 overflow-y-auto space-y-3">
             {messages.map((msg, index) => (
               <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-xs leading-relaxed ${
                   msg.role === 'user' 
-                    ? 'bg-emerald-500 text-slate-950 font-bold rounded-tr-none shadow-md shadow-emerald-500/10' 
-                    : 'bg-slate-800/80 border border-slate-700/60 text-slate-200 rounded-tl-none'
+                    ? 'bg-emerald-600 text-white font-medium rounded-tr-none' 
+                    : darkMode ? 'bg-slate-800 border border-slate-700 text-slate-200 rounded-tl-none' : 'bg-slate-100 border border-slate-200 text-slate-800 rounded-tl-none'
                 }`}>
                   {msg.content}
                 </div>
@@ -279,70 +309,55 @@ export default function Home() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-slate-800/80 border border-slate-700/60 text-slate-400 text-xs rounded-2xl rounded-tl-none px-4 py-2.5 animate-pulse">
-                  অ্যাসিস্ট্যান্ট টাইপ করছে...
+                <div className={`text-xs rounded-2xl rounded-tl-none px-4 py-2.5 flex items-center gap-2 ${darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-500'}`}>
+                  <ButtonLoader />
+                  <span>উত্তর তৈরি হচ্ছে...</span>
                 </div>
               </div>
             )}
             <div ref={chatEndRef} />
           </div>
 
-          <form onSubmit={handleSendMessage} className="p-3 border-t border-slate-800 bg-slate-950/80 flex gap-2">
+          <form onSubmit={handleSendMessage} className={`p-3 border-t flex gap-2 ${darkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'}`}>
             <input 
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder="কিছু জিজ্ঞেস করুন..."
-              className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-emerald-500 transition"
+              placeholder="প্রশ্ন লিখুন..."
+              className={`flex-1 border rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:border-emerald-600 transition ${
+                darkMode ? 'bg-slate-950 border-slate-800 text-slate-100' : 'bg-slate-50 border-slate-200 text-slate-800'
+              }`}
             />
             <button 
               type="submit"
               disabled={isLoading || !inputMessage.trim()}
-              className="bg-emerald-500 hover:bg-emerald-400 disabled:opacity-40 text-slate-950 font-bold px-4 py-2 rounded-xl text-xs transition shadow-md active:scale-95"
+              className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-sm flex items-center justify-center min-w-[60px]"
             >
-              Send
+              {isLoading ? <ButtonLoader /> : "Send"}
             </button>
           </form>
         </div>
       )}
 
-      {/* TRAIN MODAL */}
       {isTrainModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-fade-in">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg p-6 shadow-2xl relative">
+        <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className={`border rounded-3xl w-full max-w-lg p-6 shadow-2xl relative ${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-base font-bold text-amber-400 flex items-center gap-2">
-                <span>🚆</span> ফেনী স্টেশন ট্রেনের সময়সূচী
+              <h3 className={`text-base font-bold ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+                ফেনী স্টেশন ট্রেনের সময়সূচী
               </h3>
-              <button onClick={() => setIsTrainModalOpen(false)} className="text-slate-400 hover:text-slate-100 text-xs font-bold bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">বন্ধ করুন</button>
+              <button onClick={() => setIsTrainModalOpen(false)} className="text-slate-400 hover:text-slate-600 text-xs font-bold">বন্ধ করুন</button>
             </div>
-            <p className="text-xs text-slate-400 mb-4">ফেনী স্টেশন দিয়ে যাতায়াতকারী প্রধান প্রধান আন্তঃনগর ট্রেনের তালিকা নিচে দেওয়া হলো।</p>
             
-            <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
-              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex justify-between items-center">
+            <div className="space-y-2.5">
+              <div className={`p-3 rounded-xl border flex justify-between items-center ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'}`}>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-200">সোনার বাংলা এক্সপ্রেস (৭৮৭)</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">ঢাকা ➔ চট্টগ্রাম | ফেনী পৌঁছায়: সকাল ১০:৪৫</p>
+                  <h4 className={`text-xs font-bold ${darkMode ? 'text-slate-200' : 'text-slate-800'}`}>সোনার বাংলা এক্সপ্রেস (৭৮৭)</h4>
+                  <p className="text-[11px] text-slate-400">ঢাকা ➔ চট্টগ্রাম | সময়: সকাল ১০:৪৫</p>
                 </div>
-                <span className="text-[10px] bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 px-2 py-1 rounded-full font-bold">মঙ্গলবার বন্ধ</span>
-              </div>
-              <div className="p-3 bg-slate-950/60 rounded-xl border border-slate-800 flex justify-between items-center">
-                <div>
-                  <h4 className="text-xs font-bold text-slate-200">মহানগর গোধূলী (৭০৪)</h4>
-                  <p className="text-[11px] text-slate-400 mt-0.5">চট্টগ্রাম ➔ ঢাকা | ফেনী পৌঁছায়: বিকেল ০৪:১৫</p>
-                </div>
-                <span className="text-[10px] bg-slate-800 border border-slate-700 text-slate-400 px-2 py-1 rounded-full font-bold">প্রতিদিন চলে</span>
+                <span className="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded font-bold">মঙ্গলবার বন্ধ</span>
               </div>
             </div>
-
-            <a 
-              href="https://eticket.railway.gov.bd" 
-              target="_blank" 
-              rel="noreferrer"
-              className="block w-full text-center text-xs bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl mt-5 transition shadow-lg shadow-amber-500/10 active:scale-95"
-            >
-              অনলাইনে টিকিট কাটুন (রেলওয়ে ওয়েবসাইট) →
-            </a>
           </div>
         </div>
       )}
